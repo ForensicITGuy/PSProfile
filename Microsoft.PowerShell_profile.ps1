@@ -84,3 +84,47 @@ function Get-File
         Write-Host " 100%"    
     }
 }
+
+function Get-ExternalIPAddress
+{
+    <#
+
+    .SYNOPSIS
+    A simple PowerShell script to display external IP address
+
+    .DESCRIPTION
+    Queries www.myexternalip.com/raw over HTTPS and returns the externally-available IP address as seen by the site.
+
+    .EXAMPLE
+    Get-ExternalIPAddress
+    
+    Returns external IP address for localhost
+
+    .EXAMPLE
+    Get-ExternalIPAddress -ComputerName RemoteComputer.domain
+    
+    Returns external IP address for remote host
+    
+    .NOTES
+    Script queries www.myexternalip.com/raw to return IP address
+
+    .LINK
+    
+    #>
+
+    Param
+  (
+    [parameter(Mandatory=$false)]
+    [String[]]
+    $ComputerName
+  )
+
+  if (!$ComputerName)
+  {
+    (Invoke-WebRequest -Uri "https://www.myexternalip.com/raw").Content
+  }
+  else 
+  {
+      Invoke-Command -ComputerName $ComputerName -ScriptBlock {(Invoke-WebRequest -Uri "https://www.myexternalip.com/raw").Content} -Credential (Get-Credential)
+  }
+}
